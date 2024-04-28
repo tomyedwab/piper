@@ -189,10 +189,19 @@ install(
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 install(
-  FILES src/cpp/piper.hpp
+  FILES src/cpp/piper.hpp src/cpp/json.hpp
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 # Dependencies
+
+install(
+  DIRECTORY ${PIPER_PHONEMIZE_DIR}/include/
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/include
+  USE_SOURCE_PERMISSIONS  # keep +x
+  FILES_MATCHING
+  PATTERN "piper_phonemize"
+  PATTERN "*.h"
+)
 install(
   DIRECTORY ${PIPER_PHONEMIZE_DIR}/bin/
   DESTINATION ${CMAKE_INSTALL_PREFIX}
