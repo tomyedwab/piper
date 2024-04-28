@@ -38,6 +38,7 @@ if(NOT DEFINED FMT_DIR)
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${FMT_DIR}
     CMAKE_ARGS -DFMT_TEST:BOOL=OFF  # Don't build all the tests
   )
+  add_dependencies(libpiper fmt_external)
   add_dependencies(piper fmt_external)
   add_dependencies(test_piper fmt_external)
 endif()
@@ -53,6 +54,7 @@ if(NOT DEFINED SPDLOG_DIR)
     URL "https://github.com/gabime/spdlog/archive/refs/tags/v${SPDLOG_VERSION}.zip"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${SPDLOG_DIR}
   )
+  add_dependencies(libpiper spdlog_external)
   add_dependencies(piper spdlog_external)
   add_dependencies(test_piper spdlog_external)
 endif()
@@ -67,6 +69,7 @@ if(NOT DEFINED PIPER_PHONEMIZE_DIR)
     URL "https://github.com/rhasspy/piper-phonemize/archive/refs/heads/master.zip"
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${PIPER_PHONEMIZE_DIR}
   )
+  add_dependencies(libpiper piper_phonemize_external)
   add_dependencies(piper piper_phonemize_external)
   add_dependencies(test_piper piper_phonemize_external)
 endif()
@@ -84,12 +87,13 @@ endif()
 
 target_link_libraries(libpiper
   fmt
-  spdlog
   espeak-ng
   piper_phonemize
   onnxruntime
   ${LIBPIPER_EXTRA_LIBRARIES}
 )
+target_link_libraries(libpiper debug spdlogd)
+target_link_libraries(libpiper optimized spdlog)
 
 target_link_directories(libpiper PUBLIC
   ${FMT_DIR}/lib
@@ -119,12 +123,13 @@ endif()
 
 target_link_libraries(piper
   fmt
-  spdlog
   espeak-ng
   piper_phonemize
   onnxruntime
   ${PIPER_EXTRA_LIBRARIES}
 )
+target_link_libraries(piper debug spdlogd)
+target_link_libraries(piper optimized spdlog)
 
 target_link_directories(piper PUBLIC
   ${FMT_DIR}/lib
@@ -164,19 +169,28 @@ target_link_directories(
   ${PIPER_PHONEMIZE_DIR}/lib
 )
 
-target_link_libraries(test_piper PUBLIC
+target_link_libraries(test_piper
   fmt
-  spdlog
   espeak-ng
   piper_phonemize
   onnxruntime
 )
+target_link_libraries(test_piper debug spdlogd)
+target_link_libraries(test_piper optimized spdlog)
 
 # ---- Declare install targets ----
 
 install(
   TARGETS piper
   DESTINATION ${CMAKE_INSTALL_PREFIX})
+
+install(
+  TARGETS libpiper
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+
+install(
+  FILES src/cpp/piper.hpp
+  DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 # Dependencies
 install(
