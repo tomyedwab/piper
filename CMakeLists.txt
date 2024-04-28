@@ -17,6 +17,7 @@ elseif(NOT APPLE)
   string(APPEND CMAKE_C_FLAGS " -Wall -Wextra")
 endif()
 
+add_library(libpiper src/cpp/piper.cpp)
 add_executable(piper src/cpp/main.cpp src/cpp/piper.cpp)
 add_executable(test_piper src/cpp/test.cpp src/cpp/piper.cpp)
 
@@ -69,6 +70,41 @@ if(NOT DEFINED PIPER_PHONEMIZE_DIR)
   add_dependencies(piper piper_phonemize_external)
   add_dependencies(test_piper piper_phonemize_external)
 endif()
+
+# ---- Declare library ----
+
+if((NOT MSVC) AND (NOT APPLE))
+  # Linux flags
+  string(APPEND CMAKE_CXX_FLAGS " -Wall -Wextra -Wl,-rpath,'$ORIGIN'")
+  string(APPEND CMAKE_C_FLAGS " -Wall -Wextra")
+  target_link_libraries(libpiper -static-libgcc -static-libstdc++)
+
+  set(LIBPIPER_EXTRA_LIBRARIES "pthread")
+endif()
+
+target_link_libraries(libpiper
+  fmt
+  spdlog
+  espeak-ng
+  piper_phonemize
+  onnxruntime
+  ${LIBPIPER_EXTRA_LIBRARIES}
+)
+
+target_link_directories(libpiper PUBLIC
+  ${FMT_DIR}/lib
+  ${SPDLOG_DIR}/lib
+  ${PIPER_PHONEMIZE_DIR}/lib
+)
+
+target_include_directories(libpiper PUBLIC
+  ${FMT_DIR}/include
+  ${SPDLOG_DIR}/include
+  ${PIPER_PHONEMIZE_DIR}/include
+)
+
+target_compile_definitions(libpiper PUBLIC _PIPER_VERSION=${piper_version})
+
 
 # ---- Declare executable ----
 
