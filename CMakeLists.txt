@@ -199,8 +199,8 @@ install(
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include
   USE_SOURCE_PERMISSIONS  # keep +x
   FILES_MATCHING
-  PATTERN "piper_phonemize"
   PATTERN "*.h"
+  PATTERN "*.hpp"
 )
 install(
   DIRECTORY ${PIPER_PHONEMIZE_DIR}/bin/
